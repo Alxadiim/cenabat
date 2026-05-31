@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - CENABAT SARL</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center fw-bold" href="#" aria-label="CENABAT SARL">
+                <img src="images/logo.png" alt="Logo CENABAT" class="navbar-logo">
+                <span class="visually-hidden">CENABAT SARL</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Accueil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="catalogue.html">Catalogue</a></li>
+                    <li class="nav-item"><a class="nav-link" href="devis.html">Devis</a></li>
+                    <li class="nav-item"><a class="nav-link" href="apropos.html">À Propos</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <section class="page-header bg-primary-custom py-5">
+        <div class="container">
+            <h1 class="display-4 fw-bold text-white">Contactez-Nous</h1>
+            <p class="text-white-50 fs-5">Envoyez-nous votre demande de devis</p>
+        </div>
+    </section>
+
+    <!-- Contact Form -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white">
+                            <h4 class="fw-bold mb-0"><i class="fas fa-paper-plane me-2 text-warning"></i>Formulaire de demande de devis</h4>
+                        </div>
+                        <div class="card-body">
+                            <!-- Récapitulatif du devis si existant -->
+                            <div id="devis-recap" class="alert alert-info d-none mb-4">
+                                <h5><i class="fas fa-file-invoice me-2"></i>Votre devis en cours</h5>
+                                <div id="devis-recap-items"></div>
+                                <div class="mt-2">
+                                    <strong>Total articles: </strong><span id="devis-recap-total">0</span>
+                                </div>
+                            </div>
+
+                            <form id="devis-form">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-user text-warning me-2"></i>Nom complet *
+                                        </label>
+                                        <input type="text" class="form-control form-control-lg" required 
+                                               placeholder="Votre nom et prénom" name="nom">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-phone text-warning me-2"></i>Téléphone *
+                                        </label>
+                                        <input type="tel" class="form-control form-control-lg" required 
+                                               placeholder="Votre numéro de téléphone" name="telephone">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-map-marker-alt text-warning me-2"></i>Adresse de livraison *
+                                        </label>
+                                        <input type="text" class="form-control form-control-lg" required 
+                                               placeholder="Adresse complète de livraison" name="adresse">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-truck-loading text-warning me-2"></i>Mode de retrait *
+                                        </label>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="form-check form-check-inline w-100">
+                                                    <input class="form-check-input" type="radio" 
+                                                           name="modeRetrait" id="livraison" value="livraison" checked>
+                                                    <label class="form-check-label w-100 p-3 border rounded" for="livraison">
+                                                        <i class="fas fa-truck text-warning me-2"></i>
+                                                        <strong>Livraison par CENABAT</strong>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-check form-check-inline w-100">
+                                                    <input class="form-check-input" type="radio" 
+                                                           name="modeRetrait" id="retrait" value="retrait">
+                                                    <label class="form-check-label w-100 p-3 border rounded" for="retrait">
+                                                        <i class="fas fa-warehouse text-warning me-2"></i>
+                                                        <strong>Retrait au dépôt</strong>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-comment text-warning me-2"></i>Message (optionnel)
+                                        </label>
+                                        <textarea class="form-control form-control-lg" rows="3" 
+                                                  placeholder="Informations complémentaires..." name="message"></textarea>
+                                    </div>
+                                    <div class="col-12 text-center">
+                                        <button type="submit" class="btn btn-warning btn-lg fw-bold px-5">
+                                            <i class="fas fa-paper-plane me-2"></i>Envoyer la Demande de Devis
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Info -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="service-card text-center p-4">
+                        <i class="fas fa-phone fa-3x text-warning mb-3"></i>
+                        <h4 class="fw-bold">Téléphone</h4>
+                        <p class="text-muted">+225 XX XXX XXX</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="service-card text-center p-4">
+                        <i class="fas fa-envelope fa-3x text-warning mb-3"></i>
+                        <h4 class="fw-bold">Email</h4>
+                        <p class="text-muted">contact@cenabat.com</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="service-card text-center p-4">
+                        <i class="fas fa-map-marker-alt fa-3x text-warning mb-3"></i>
+                        <h4 class="fw-bold">Adresse</h4>
+                        <p class="text-muted">Côte d'Ivoire</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="fw-bold text-warning"><i class="fas fa-building me-2"></i>CENABAT SARL</h5>
+                    <p class="text-white-50">Votre partenaire de confiance pour tous vos matériaux de construction.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-1"><i class="fas fa-envelope text-warning me-2"></i>contact@cenabat.com</p>
+                    <p class="mb-1"><i class="fas fa-phone text-warning me-2"></i>+225 XX XXX XXX</p>
+                    <p><i class="fas fa-map-marker-alt text-warning me-2"></i>Côte d'Ivoire</p>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="text-white-50 mb-0">&copy; 2026 CENABAT SARL - Tous droits réservés</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal Confirmation -->
+    <div class="modal fade" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fas fa-check-circle me-2"></i>Devis Envoyé !
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <i class="fas fa-check-circle text-success fa-4x mb-3"></i>
+                    <h4>Votre demande de devis a été envoyée avec succès !</h4>
+                    <p class="text-muted">Notre équipe vous contactera dans les plus brefs délais.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+                        <i class="fas fa-thumbs-up me-2"></i>Merci !
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Script spécifique pour la page contact
+        document.addEventListener('DOMContentLoaded', function() {
+            // Afficher le récapitulatif du devis si des produits sont sélectionnés
+            if (cart.length > 0) {
+                const recapDiv = document.getElementById('devis-recap');
+                const recapItems = document.getElementById('devis-recap-items');
+                const recapTotal = document.getElementById('devis-recap-total');
+                
+                recapDiv.classList.remove('d-none');
+                recapItems.innerHTML = cart.map(item => `
+                    <div class="d-flex justify-content-between">
+                        <span>${item.name}</span>
+                        <span class="fw-bold">×${item.quantity}</span>
+                    </div>
+                `).join('');
+                
+                const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+                recapTotal.textContent = total;
+            }
+            
+            // Gestion du formulaire
+            const form = document.getElementById('devis-form');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (cart.length === 0) {
+                    alert('Veuillez d\'abord ajouter des produits à votre devis depuis le catalogue.');
+                    window.location.href = 'catalogue.html';
+                    return;
+                }
+                
+                // Collecter les données
+                const formData = new FormData(form);
+                const devisData = {
+                    client: {
+                        nom: formData.get('nom'),
+                        telephone: formData.get('telephone'),
+                        adresse: formData.get('adresse'),
+                        modeRetrait: form.querySelector('input[name="modeRetrait"]:checked').value,
+                        message: formData.get('message')
+                    },
+                    produits: cart,
+                    totalArticles: cart.reduce((sum, item) => sum + item.quantity, 0)
+                };
+                
+                console.log('Données du devis:', devisData);
+                
+                // Afficher le modal de confirmation
+                const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+                confirmModal.show();
+                
+                // Vider le panier
+                cart = [];
+                updateCartUI();
+                
+                // Réinitialiser le formulaire
+                form.reset();
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Devis - CENABAT SARL</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center fw-bold" href="#" aria-label="CENABAT SARL">
+                <img src="images/logo.png" alt="Logo CENABAT" class="navbar-logo">
+                <span class="visually-hidden">CENABAT SARL</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Accueil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="catalogue.html">Catalogue</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="devis.html">Devis</a></li>
+                    <li class="nav-item"><a class="nav-link" href="apropos.html">À Propos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <section class="page-header bg-primary-custom py-5">
+        <div class="container">
+            <h1 class="display-4 fw-bold text-white">Mon Devis</h1>
+            <p class="text-white-50 fs-5">Récapitulatif de votre demande de devis</p>
+        </div>
+    </section>
+
+    <!-- Devis -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <!-- Liste des produits -->
+                <div class="col-lg-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white">
+                            <h4 class="fw-bold mb-0"><i class="fas fa-list me-2 text-warning"></i>Articles sélectionnés</h4>
+                        </div>
+                        <div class="card-body">
+                            <div id="devis-items">
+                                <p class="text-center text-muted py-5">
+                                    <i class="fas fa-shopping-cart fa-3x mb-3 d-block"></i>
+                                    Votre devis est vide
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Résumé -->
+                <div class="col-lg-4">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-white">
+                            <h4 class="fw-bold mb-0"><i class="fas fa-calculator me-2 text-warning"></i>Résumé</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-3">
+                                <span>Total articles:</span>
+                                <span class="fw-bold" id="devis-total-items">0</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span>Catégories:</span>
+                                <span class="fw-bold" id="devis-categories">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a href="catalogue.html" class="btn btn-outline-primary">
+                            <i class="fas fa-plus me-2"></i>Ajouter des produits
+                        </a>
+                        <button class="btn btn-warning fw-bold" id="finaliser-devis">
+                            <i class="fas fa-paper-plane me-2"></i>Finaliser le devis
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="fw-bold text-warning"><i class="fas fa-building me-2"></i>CENABAT SARL</h5>
+                    <p class="text-white-50">Votre partenaire de confiance pour tous vos matériaux de construction.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-1"><i class="fas fa-envelope text-warning me-2"></i>contact@cenabat.com</p>
+                    <p class="mb-1"><i class="fas fa-phone text-warning me-2"></i>+225 XX XXX XXX</p>
+                    <p><i class="fas fa-map-marker-alt text-warning me-2"></i>Côte d'Ivoire</p>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="text-white-50 mb-0">&copy; 2026 CENABAT SARL - Tous droits réservés</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Script spécifique pour la page devis
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDevisPage();
+            
+            document.getElementById('finaliser-devis').addEventListener('click', function() {
+                if (cart.length === 0) {
+                    alert('Votre devis est vide. Ajoutez des produits depuis le catalogue.');
+                    return;
+                }
+                window.location.href = 'contact.html';
+            });
+        });
+
+        function updateDevisPage() {
+            const itemsContainer = document.getElementById('devis-items');
+            const totalItems = document.getElementById('devis-total-items');
+            const categoriesCount = document.getElementById('devis-categories');
+            
+            if (cart.length === 0) {
+                itemsContainer.innerHTML = `
+                    <p class="text-center text-muted py-5">
+                        <i class="fas fa-shopping-cart fa-3x mb-3 d-block"></i>
+                        Votre devis est vide
+                    </p>
+                    <div class="text-center">
+                        <a href="catalogue.html" class="btn btn-warning">
+                            <i class="fas fa-shopping-cart me-2"></i>Parcourir le catalogue
+                        </a>
+                    </div>
+                `;
+                totalItems.textContent = '0';
+                categoriesCount.textContent = '0';
+            } else {
+                const uniqueCategories = [...new Set(cart.map(item => item.category))].length;
+                
+                itemsContainer.innerHTML = cart.map(item => `
+                    <div class="devis-item d-flex align-items-center p-3 mb-3 bg-light rounded">
+                        <div class="devis-item-icon me-3">
+                            <i class="fas ${item.icon} fa-lg"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">${item.name}</h6>
+                            <small class="text-muted">${item.categoryLabel}</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="fw-bold text-warning">× ${item.quantity}</div>
+                            <button class="btn btn-sm btn-outline-danger" onclick="removeFromCart(${item.id}); updateDevisPage();">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+                
+                const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+                totalItems.textContent = total;
+                categoriesCount.textContent = uniqueCategories;
+            }
+        }
+    </script>
+</body>
+</html>
