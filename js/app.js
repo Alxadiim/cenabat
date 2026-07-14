@@ -355,14 +355,8 @@ function setupCartButtons() {
                 return;
             }
             
-            // Fermer le modal du panier
-            const cartModal = bootstrap.Modal.getInstance(document.getElementById('cartModal'));
-            cartModal.hide();
-            
-            // Faire défiler vers le formulaire de contact
-            setTimeout(() => {
-                document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
-            }, 300);
+            // Rediriger vers la page de contact
+            window.location.href = 'contact.html';
         });
     }
 }
@@ -384,11 +378,11 @@ function setupDevisForm() {
             const formData = new FormData(form);
             const devisData = {
                 client: {
-                    nom: formData.get('nom') || form.querySelector('input[type="text"]').value,
-                    telephone: formData.get('tel') || form.querySelector('input[type="tel"]').value,
-                    adresse: formData.get('adresse') || form.querySelector('input[type="text"]:nth-of-type(3)').value,
+                    nom: formData.get('nom'),
+                    telephone: formData.get('telephone'),
+                    adresse: formData.get('adresse'),
                     modeRetrait: form.querySelector('input[name="modeRetrait"]:checked').value,
-                    message: form.querySelector('textarea').value
+                    message: formData.get('message')
                 },
                 produits: cart,
                 totalArticles: cart.reduce((sum, item) => sum + item.quantity, 0)
