@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - CENABAT SARL</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .admin-container {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .admin-sidebar {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-blue) 100%);
+            min-height: 100vh;
+            padding: 2rem 0;
+            position: sticky;
+            top: 0;
+        }
+        .admin-sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            border-left: 3px solid transparent;
+            padding: 1rem 1.5rem;
+            transition: all 0.3s;
+        }
+        .admin-sidebar .nav-link:hover,
+        .admin-sidebar .nav-link.active {
+            color: var(--accent-orange);
+            background-color: rgba(0, 0, 0, 0.1);
+            border-left-color: var(--accent-orange);
+        }
+        .admin-content {
+            padding: 2rem;
+        }
+        .product-table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .btn-action {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            margin-right: 0.25rem;
+        }
+        .form-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        .category-select {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .category-option {
+            padding: 0.5rem 1rem;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .category-option.active {
+            border-color: var(--accent-orange);
+            background-color: var(--accent-orange);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Admin Navbar -->
+    <nav class="navbar navbar-dark bg-dark sticky-top">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">
+                <i class="fas fa-lock me-2"></i>CENABAT - Administration
+            </span>
+            <div class="d-flex align-items-center">
+                <span class="text-light me-3" id="admin-user">Admin</span>
+                <button class="btn btn-outline-light btn-sm" onclick="logout()">
+                    <i class="fas fa-sign-out-alt me-1"></i>Déconnexion
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row admin-container">
+            <!-- Sidebar -->
+            <div class="col-md-2 admin-sidebar">
+                <nav class="nav flex-column">
+                    <a class="nav-link active" href="#products" onclick="switchTab('products')">
+                        <i class="fas fa-list me-2"></i>Produits
+                    </a>
+                    <a class="nav-link" href="#add-product" onclick="switchTab('add-product')">
+                        <i class="fas fa-plus-circle me-2"></i>Ajouter Produit
+                    </a>
+                    <a class="nav-link" href="#settings" onclick="switchTab('settings')">
+                        <i class="fas fa-cog me-2"></i>Paramètres
+                    </a>
+                    <a class="nav-link" href="index.html">
+                        <i class="fas fa-home me-2"></i>Retour au Site
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10 admin-content">
+                <!-- Produits Tab -->
+                <div id="products-tab" class="tab-content">
+                    <h2 class="mb-4">
+                        <i class="fas fa-inventory me-2 text-warning"></i>Gestion des Produits
+                    </h2>
+
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="search-product" 
+                               placeholder="Rechercher un produit..." onkeyup="filterProducts()">
+                    </div>
+
+                    <div class="product-table-container">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nom</th>
+                                    <th>Catégorie</th>
+                                    <th>Description</th>
+                                    <th>Prix</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="products-table-body">
+                                <!-- Rempli par JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Add/Edit Product Tab -->
+                <div id="add-product-tab" class="tab-content d-none">
+                    <h2 class="mb-4">
+                        <i class="fas fa-plus-circle me-2 text-warning"></i>
+                        <span id="form-title">Ajouter un Nouveau Produit</span>
+                    </h2>
+
+                    <div class="form-section">
+                        <form id="product-form">
+                            <input type="hidden" id="product-id">
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Nom du produit *</label>
+                                    <input type="text" class="form-control" id="product-name" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Prix (optionnel)</label>
+                                    <input type="number" class="form-control" id="product-price" 
+                                           min="0" step="0.01" placeholder="0.00">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Catégorie *</label>
+                                <div class="category-select">
+                                    <button type="button" class="category-option" data-category="fer" 
+                                            onclick="selectCategory(this)">Fer à béton</button>
+                                    <button type="button" class="category-option" data-category="carrelage"
+                                            onclick="selectCategory(this)">Carrelage</button>
+                                    <button type="button" class="category-option" data-category="plomberie"
+                                            onclick="selectCategory(this)">Plomberie</button>
+                                    <button type="button" class="category-option" data-category="electricite"
+                                            onclick="selectCategory(this)">Électricité</button>
+                                    <button type="button" class="category-option" data-category="peinture"
+                                            onclick="selectCategory(this)">Peinture</button>
+                                    <button type="button" class="category-option" data-category="menuiserie"
+                                            onclick="selectCategory(this)">Menuiserie</button>
+                                </div>
+                                <input type="hidden" id="product-category">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Description *</label>
+                                <textarea class="form-control" id="product-description" 
+                                          rows="3" required></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Icône Font Awesome</label>
+                                <input type="text" class="form-control" id="product-icon" 
+                                       placeholder="Ex: fa-grip-lines" value="fa-box">
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-warning btn-lg fw-bold">
+                                    <i class="fas fa-save me-2"></i>Enregistrer
+                                </button>
+                                <button type="button" class="btn btn-secondary btn-lg" onclick="resetForm()">
+                                    <i class="fas fa-times me-2"></i>Annuler
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Settings Tab -->
+                <div id="settings-tab" class="tab-content d-none">
+                    <h2 class="mb-4">
+                        <i class="fas fa-cog me-2 text-warning"></i>Paramètres
+                    </h2>
+
+                    <div class="form-section">
+                        <h4 class="mb-3">Données</h4>
+                        <p class="text-muted">Exportez ou réinitialisez les données du catalogue.</p>
+                        
+                        <div class="btn-group mb-4" role="group">
+                            <button type="button" class="btn btn-info" onclick="exportData()">
+                                <i class="fas fa-download me-2"></i>Exporter les données
+                            </button>
+                            <button type="button" class="btn btn-warning" onclick="resetData()">
+                                <i class="fas fa-redo me-2"></i>Réinitialiser
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4 class="mb-3">Sécurité</h4>
+                        <p class="text-muted">Changez votre mot de passe d'accès.</p>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Ancien mot de passe</label>
+                            <input type="password" class="form-control" id="old-password">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nouveau mot de passe</label>
+                            <input type="password" class="form-control" id="new-password">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Confirmer le mot de passe</label>
+                            <input type="password" class="form-control" id="confirm-password">
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="changePassword()">
+                            <i class="fas fa-lock me-2"></i>Changer le mot de passe
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal d'édition rapide -->
+    <div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title fw-bold">Modifier le produit</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="modal-name">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="modal-description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Prix</label>
+                        <input type="number" class="form-control" id="modal-price" min="0" step="0.01">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-warning" onclick="saveQuickEdit()">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

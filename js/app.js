@@ -3,201 +3,244 @@
  * Gestion du catalogue de produits et du panier de devis
  */
 
-// === Base de données des produits ===
-const products = [
-    // Fer à béton
-    {
-        id: 1,
-        name: "Fer à béton 6mm",
-        category: "fer",
-        categoryLabel: "Fer à béton",
-        description: "Fer à béton haute résistance pour construction",
-        icon: "fa-grip-lines"
-    },
-    {
-        id: 2,
-        name: "Fer à béton 8mm",
-        category: "fer",
-        categoryLabel: "Fer à béton",
-        description: "Fer à béton 8mm pour dallage et fondation",
-        icon: "fa-grip-lines"
-    },
-    {
-        id: 3,
-        name: "Fer à béton 10mm",
-        category: "fer",
-        categoryLabel: "Fer à béton",
-        description: "Fer à béton 10mm pour structure porteuse",
-        icon: "fa-grip-lines"
-    },
-    {
-        id: 4,
-        name: "Fer à béton 12mm",
-        category: "fer",
-        categoryLabel: "Fer à béton",
-        description: "Fer à béton 12mm haute résistance",
-        icon: "fa-grip-lines"
-    },
-    // Carrelage
-    {
-        id: 5,
-        name: "Carrelage mural 20x20",
-        category: "carrelage",
-        categoryLabel: "Carrelage",
-        description: "Carrelage mural blanc brillant",
-        icon: "fa-th"
-    },
-    {
-        id: 6,
-        name: "Carrelage sol 30x30",
-        category: "carrelage",
-        categoryLabel: "Carrelage",
-        description: "Carrelage sol antidérapant gris",
-        icon: "fa-th"
-    },
-    {
-        id: 7,
-        name: "Carrelage faïence 15x15",
-        category: "carrelage",
-        categoryLabel: "Carrelage",
-        description: "Carrelage faïence多彩 pour salle de bain",
-        icon: "fa-th"
-    },
-    {
-        id: 8,
-        name: "Carrelage extérieur 40x40",
-        category: "carrelage",
-        categoryLabel: "Carrelage",
-        description: "Carrelage extérieur résistant gel",
-        icon: "fa-th"
-    },
-    // Plomberie / Sanitaire
-    {
-        id: 9,
-        name: "Robinetterie lavabo",
-        category: "plomberie",
-        categoryLabel: "Plomberie",
-        description: "Robinetterie chrome pour lavabo",
-        icon: "fa-faucet"
-    },
-    {
-        id: 10,
-        name: "WC suspendu",
-        category: "plomberie",
-        categoryLabel: "Plomberie",
-        description: "WC suspendu avec abattant",
-        icon: "fa-toilet"
-    },
-    {
-        id: 11,
-        name: "Receveur de douche",
-        category: "plomberie",
-        categoryLabel: "Plomberie",
-        description: "Receveur de douche 80x80",
-        icon: "fa-shower"
-    },
-    {
-        id: 12,
-        name: "Ballon d'eau chaude",
-        category: "plomberie",
-        categoryLabel: "Plomberie",
-        description: "Ballon eau chaude 100L",
-        icon: "fa-hot-water"
-    },
-    // Électricité
-    {
-        id: 13,
-        name: "Câble électrique 2.5mm²",
-        category: "electricite",
-        categoryLabel: "Électricité",
-        description: "Câble électrique rigide 100m",
-        icon: "fa-bolt"
-    },
-    {
-        id: 14,
-        name: "Prise de courant",
-        category: "electricite",
-        categoryLabel: "Électricité",
-        description: "Prise de courant encastrée",
-        icon: "fa-plug"
-    },
-    {
-        id: 15,
-        name: "Interrupteur va-et-vient",
-        category: "electricite",
-        categoryLabel: "Électricité",
-        description: "Interrupteur va-et-vient",
-        icon: "fa-toggle-on"
-    },
-    {
-        id: 16,
-        name: "Tableau électrique",
-        category: "electricite",
-        categoryLabel: "Électricité",
-        description: "Tableau électrique 2 rangées",
-        icon: "fa-box"
-    },
-    // Peinture
-    {
-        id: 17,
-        name: "Peinture vinylique 25L",
-        category: "peinture",
-        categoryLabel: "Peinture",
-        description: "Peinture vinylique blanche",
-        icon: "fa-paint-roller"
-    },
-    {
-        id: 18,
-        name: "Peinture glycéro 20L",
-        category: "peinture",
-        categoryLabel: "Peinture",
-        description: "Peinture glycéro satinée",
-        icon: "fa-paint-roller"
-    },
-    {
-        id: 19,
-        name: "Sous-couche universelle",
-        category: "peinture",
-        categoryLabel: "Peinture",
-        description: "Sous-couche universelle 10L",
-        icon: "fa-fill-drip"
-    },
-    {
-        id: 20,
-        name: "Enduit de rebouchage",
-        category: "peinture",
-        categoryLabel: "Peinture",
-        description: "Enduit de rebouchage 5kg",
-        icon: "fa-fill-drip"
-    },
-    // Menuiserie
-    {
-        id: 21,
-        name: "Porte intérieure",
-        category: "menuiserie",
-        categoryLabel: "Menuiserie",
-        description: "Porte intérieure pré-peinte",
-        icon: "fa-door-closed"
-    },
-    {
-        id: 22,
-        name: "Fenêtre aluminium",
-        category: "menuiserie",
-        categoryLabel: "Menuiserie",
-        description: "Fenêtre aluminium 120x120",
-        icon: "fa-window-maximize"
-    },
-    {
-        id: 23,
-        name: "Volet roulant",
-        category: "menuiserie",
-        categoryLabel: "Menuiserie",
-        description: "Volet roulant PVC",
-        icon: "fa-blinds"
-    },
-    {
-        id: 24,
-        name: "Plinthe bois",
+// === Chargement des produits depuis localStorage ===
+function getProducts() {
+    const stored = localStorage.getItem('cenabat_products');
+    if (stored) {
+        return JSON.parse(stored);
+    }
+    return getDefaultProducts();
+}
+
+// === Produits par défaut ===
+function getDefaultProducts() {
+    return [
+        // Fer à béton
+        {
+            id: 1,
+            name: "Fer à béton 6mm",
+            category: "fer",
+            categoryLabel: "Fer à béton",
+            description: "Fer à béton haute résistance pour construction",
+            price: 0,
+            icon: "fa-grip-lines"
+        },
+        {
+            id: 2,
+            name: "Fer à béton 8mm",
+            category: "fer",
+            categoryLabel: "Fer à béton",
+            description: "Fer à béton 8mm pour dallage et fondation",
+            price: 0,
+            icon: "fa-grip-lines"
+        },
+        {
+            id: 3,
+            name: "Fer à béton 10mm",
+            category: "fer",
+            categoryLabel: "Fer à béton",
+            description: "Fer à béton 10mm pour structure porteuse",
+            price: 0,
+            icon: "fa-grip-lines"
+        },
+        {
+            id: 4,
+            name: "Fer à béton 12mm",
+            category: "fer",
+            categoryLabel: "Fer à béton",
+            description: "Fer à béton 12mm haute résistance",
+            price: 0,
+            icon: "fa-grip-lines"
+        },
+        // Carrelage
+        {
+            id: 5,
+            name: "Carrelage mural 20x20",
+            category: "carrelage",
+            categoryLabel: "Carrelage",
+            description: "Carrelage mural blanc brillant",
+            price: 0,
+            icon: "fa-th"
+        },
+        {
+            id: 6,
+            name: "Carrelage sol 30x30",
+            category: "carrelage",
+            categoryLabel: "Carrelage",
+            description: "Carrelage sol antidérapant gris",
+            price: 0,
+            icon: "fa-th"
+        },
+        {
+            id: 7,
+            name: "Carrelage faïence 15x15",
+            category: "carrelage",
+            categoryLabel: "Carrelage",
+            description: "Carrelage faïence pour salle de bain",
+            price: 0,
+            icon: "fa-th"
+        },
+        {
+            id: 8,
+            name: "Carrelage extérieur 40x40",
+            category: "carrelage",
+            categoryLabel: "Carrelage",
+            description: "Carrelage extérieur résistant gel",
+            price: 0,
+            icon: "fa-th"
+        },
+        // Plomberie / Sanitaire
+        {
+            id: 9,
+            name: "Robinetterie lavabo",
+            category: "plomberie",
+            categoryLabel: "Plomberie",
+            description: "Robinetterie chrome pour lavabo",
+            price: 0,
+            icon: "fa-faucet"
+        },
+        {
+            id: 10,
+            name: "WC suspendu",
+            category: "plomberie",
+            categoryLabel: "Plomberie",
+            description: "WC suspendu avec abattant",
+            price: 0,
+            icon: "fa-toilet"
+        },
+        {
+            id: 11,
+            name: "Receveur de douche",
+            category: "plomberie",
+            categoryLabel: "Plomberie",
+            description: "Receveur de douche 80x80",
+            price: 0,
+            icon: "fa-shower"
+        },
+        {
+            id: 12,
+            name: "Ballon d'eau chaude",
+            category: "plomberie",
+            categoryLabel: "Plomberie",
+            description: "Ballon eau chaude 100L",
+            price: 0,
+            icon: "fa-hot-water"
+        },
+        // Électricité
+        {
+            id: 13,
+            name: "Câble électrique 2.5mm²",
+            category: "electricite",
+            categoryLabel: "Électricité",
+            description: "Câble électrique rigide 100m",
+            price: 0,
+            icon: "fa-bolt"
+        },
+        {
+            id: 14,
+            name: "Prise de courant",
+            category: "electricite",
+            categoryLabel: "Électricité",
+            description: "Prise de courant encastrée",
+            price: 0,
+            icon: "fa-plug"
+        },
+        {
+            id: 15,
+            name: "Interrupteur va-et-vient",
+            category: "electricite",
+            categoryLabel: "Électricité",
+            description: "Interrupteur va-et-vient",
+            price: 0,
+            icon: "fa-toggle-on"
+        },
+        {
+            id: 16,
+            name: "Tableau électrique",
+            category: "electricite",
+            categoryLabel: "Électricité",
+            description: "Tableau électrique 2 rangées",
+            price: 0,
+            icon: "fa-box"
+        },
+        // Peinture
+        {
+            id: 17,
+            name: "Peinture vinylique 25L",
+            category: "peinture",
+            categoryLabel: "Peinture",
+            description: "Peinture vinylique blanche",
+            price: 0,
+            icon: "fa-paint-roller"
+        },
+        {
+            id: 18,
+            name: "Peinture glycéro 20L",
+            category: "peinture",
+            categoryLabel: "Peinture",
+            description: "Peinture glycéro satinée",
+            price: 0,
+            icon: "fa-paint-roller"
+        },
+        {
+            id: 19,
+            name: "Sous-couche universelle",
+            category: "peinture",
+            categoryLabel: "Peinture",
+            description: "Sous-couche universelle 10L",
+            price: 0,
+            icon: "fa-fill-drip"
+        },
+        {
+            id: 20,
+            name: "Enduit de rebouchage",
+            category: "peinture",
+            categoryLabel: "Peinture",
+            description: "Enduit de rebouchage 5kg",
+            price: 0,
+            icon: "fa-fill-drip"
+        },
+        // Menuiserie
+        {
+            id: 21,
+            name: "Porte intérieure",
+            category: "menuiserie",
+            categoryLabel: "Menuiserie",
+            description: "Porte intérieure pré-peinte",
+            price: 0,
+            icon: "fa-door-closed"
+        },
+        {
+            id: 22,
+            name: "Fenêtre aluminium",
+            category: "menuiserie",
+            categoryLabel: "Menuiserie",
+            description: "Fenêtre aluminium 120x120",
+            price: 0,
+            icon: "fa-window-maximize"
+        },
+        {
+            id: 23,
+            name: "Volet roulant",
+            category: "menuiserie",
+            categoryLabel: "Menuiserie",
+            description: "Volet roulant PVC",
+            price: 0,
+            icon: "fa-blinds"
+        },
+        {
+            id: 24,
+            name: "Plinthe bois",
+            category: "menuiserie",
+            categoryLabel: "Menuiserie",
+            description: "Plinthe bois massif 2m",
+            price: 0,
+            icon: "fa-ruler-horizontal"
+        }
+    ];
+}
+
+let products = getProducts();
         category: "menuiserie",
         categoryLabel: "Menuiserie",
         description: "Plinthe bois massif 2m",
