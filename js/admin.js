@@ -24,6 +24,35 @@ window.addEventListener('load', function() {
     setupFormListeners();
 });
 
+// === Firestore helpers ===
+async function fetchProductsFromFirestore() {
+    if (!window.firestore) return null;
+    try {
+        const snapshot = await window.firestore.collection('products').get();
+        const docs = snapshot.docs.map(d => ({ id: parseInt(d.id, 10) || Number(d.id), ...d.data() }));
+        return docs;
+    } catch (e) {
+        console.warn('Erreur lecture Firestore:', e);
+        return null;
+    }
+}
+
+async function saveProductsToFirestore(products) {
+    if (!window.firestore) return;
+    try {
+        const batch = window.firestore.batch();
+        const colRef = window.firestore.collection('products');
+        products.forEach(p => {
+            const ref = colRef.doc(String(p.id));
+            batch.set(ref, { ...p });
+        });
+        await batch.commit();
+        console.info('Produits sauvegardés dans Firestore.');
+    } catch (e) {
+        console.warn('Erreur écriture Firestore:', e);
+    }
+}
+
 // === Authentification ===
 function requestPassword() {
     const password = prompt('Entrez le mot de passe d\'administration:');
@@ -68,10 +97,11 @@ function switchTab(tabName) {
 
 // === Chargement et affichage des produits ===
 function loadProductsTable() {
-    const products = getProducts();
     const tbody = document.getElementById('products-table-body');
+    // Rendu initial depuis localStorage pour rapidité
+    const localProducts = getProducts();
     
-    tbody.innerHTML = products.map(product => `
+    tbody.innerHTML = localProducts.map(product => `
         <tr>
             <td>#${product.id}</td>
             <td><strong>${product.name}</strong></td>
@@ -98,6 +128,16 @@ function loadProductsTable() {
                 </td>
             </tr>
         `;
+    }
+
+    // Si Firestore est configuré, remplacer par les données serveur (sync)
+    if (window.firestore) {
+        fetchProductsFromFirestore().then(remote => {
+            if (remote && remote.length) {
+                saveProducts(remote); // met à jour localStorage
+                loadProductsTable(); // re-render
+            }
+        });
     }
 }
 
@@ -211,6 +251,10 @@ function saveProduct(e) {
     }
     
     saveProducts(products);
+    // Tentative d'envoi vers Firestore en arrière-plan
+    if (window.firestore) {
+        saveProductsToFirestore(products);
+    }
     resetForm();
     loadProductsTable();
     
@@ -233,6 +277,10 @@ function deleteProduct(productId) {
     let products = getProducts();
     products = products.filter(p => p.id !== productId);
     saveProducts(products);
+    if (window.firestore) {
+        // Mettre à jour Firestore
+        saveProductsToFirestore(products);
+    }
     loadProductsTable();
     alert('Produit supprimé!');
 }

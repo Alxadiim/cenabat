@@ -12,6 +12,21 @@ function getProducts() {
     return getDefaultProducts();
 }
 
+// Si Firestore est disponible, récupérer les produits distante et mettre à jour l'UI
+async function syncProductsFromFirestoreIfAvailable(renderCallback) {
+    if (!window.firestore) return;
+    try {
+        const snapshot = await window.firestore.collection('products').get();
+        const docs = snapshot.docs.map(d => ({ id: parseInt(d.id, 10) || Number(d.id), ...d.data() }));
+        if (docs && docs.length) {
+            localStorage.setItem('cenabat_products', JSON.stringify(docs));
+            if (typeof renderCallback === 'function') renderCallback();
+        }
+    } catch (e) {
+        console.warn('Erreur sync Firestore:', e);
+    }
+}
+
 // === Produits par défaut ===
 function getDefaultProducts() {
     return [
@@ -257,6 +272,8 @@ document.addEventListener('DOMContentLoaded', function() {
     setupCategoryFilters();
     setupDevisForm();
     setupCartButtons();
+    // Synchroniser depuis Firestore si disponible
+    syncProductsFromFirestoreIfAvailable(() => renderProducts(document.querySelector('.category-filters .active')?.dataset.category || 'all'));
 });
 
 // === Rendu des produits ===
