@@ -16,6 +16,10 @@ window.addEventListener('load', function() {
         localStorage.setItem('cenabat_admin_password', 'admin123');
     }
 
+    if (typeof updateFirebaseStatus === 'function') {
+        updateFirebaseStatus();
+    }
+
     if (auth !== 'true') {
         showLoginModal();
     } else {
@@ -37,7 +41,10 @@ async function fetchProductsFromFirestore() {
     if (!isFirestoreReady()) return null;
     try {
         const snapshot = await window.firestore.collection('products').get();
-        const docs = snapshot.docs.map(d => ({ id: parseInt(d.id, 10) || Number(d.id), ...d.data() }));
+        const docs = snapshot.docs.map(d => ({
+            id: parseInt(d.id, 10) || Number(d.id),
+            ...d.data()
+        }));
         return docs;
     } catch (e) {
         console.warn('Erreur lecture Firestore:', e);
@@ -50,14 +57,25 @@ async function saveProductsToFirestore(products) {
     try {
         const batch = window.firestore.batch();
         const colRef = window.firestore.collection('products');
-        products.forEach(p => {
-            const ref = colRef.doc(String(p.id));
-            batch.set(ref, { ...p });
+
+        products.forEach(product => {
+            const ref = colRef.doc(String(product.id));
+            batch.set(ref, { ...product });
         });
+
         await batch.commit();
         console.info('Produits sauvegardés dans Firestore.');
     } catch (e) {
         console.warn('Erreur écriture Firestore:', e);
+    }
+}
+
+async function syncLocalProductsFromFirestore() {
+    if (!isFirestoreReady()) return;
+    const remoteProducts = await fetchProductsFromFirestore();
+    if (remoteProducts && remoteProducts.length) {
+        saveProducts(remoteProducts);
+        loadProductsTable();
     }
 }
 
@@ -180,12 +198,7 @@ function loadProductsTable() {
 
     // Si Firestore est configuré, remplacer par les données serveur (sync)
     if (isFirestoreReady()) {
-        fetchProductsFromFirestore().then(remote => {
-            if (remote && remote.length) {
-                saveProducts(remote);
-                loadProductsTable();
-            }
-        });
+        syncLocalProductsFromFirestore();
     }
 }
 

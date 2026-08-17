@@ -1,36 +1,68 @@
 Guide rapide — Configuration Firebase pour CENABAT
 
-1) Créer un projet Firebase
+1. Créer un projet Firebase
+
 - Rendez-vous sur https://console.firebase.google.com/ et créez un projet.
 
-2) Activer Firestore
-- Dans votre projet, allez à "Firestore Database" → Créer une base en mode "production" ou "test".
+2. Activer Firestore
 
-3) Récupérer la configuration Web
-- Allez dans la roue dentée (Paramètres du projet) → "Vos applications" → Ajouter une application Web si nécessaire.
-- Copiez la configuration (apiKey, authDomain, projectId, ...)
+- Dans votre projet, allez à "Firestore Database" → "Créer une base de données".
+- Choisissez un mode de test ou production selon votre plan de démarrage.
 
-4) Règles Firestore (exemple basique pour admin uniquement)
-- Dans Firestore → Rules, utiliser temporairement (à sécuriser ensuite):
+3. Récupérer la configuration Web
 
+- Allez dans les paramètres du projet → "Vos applications" → Ajouter une application Web.
+- Copiez la configuration firebase (apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId).
+
+4. Configurer le site pour utiliser cette clé
+
+- Ouvrez le fichier `admin.html`.
+- Définissez avant le chargement du script principal :
+
+```html
+<script>
+  window.CENABAT_FIREBASE_CONFIG = {
+    apiKey: "VOTRE_API_KEY",
+    authDomain: "VOTRE_PROJECT.firebaseapp.com",
+    projectId: "VOTRE_PROJECT",
+    storageBucket: "VOTRE_PROJECT.appspot.com",
+    messagingSenderId: "1234567890",
+    appId: "1:1234567890:web:abcd1234",
+  };
+</script>
+```
+
+- Si les valeurs restent en `REPLACE_ME`, le site reste en mode localStorage sans erreur.
+
+5. Règles Firestore (exemple)
+
+- Dans Firestore → Rules, utilisez temporairement :
+
+```js
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /products/{productId} {
-      allow read, write: if request.auth != null;
+      allow read: if true;
+      allow write: if true;
     }
   }
 }
+```
 
-(Remarque: pour simplifier, le code d'administration que j'ai ajouté n'utilise pas Firebase Auth. Pour production, configurez une authentification et adaptez les règles.)
+- En production, il faudra sécuriser avec Firebase Auth ou un système d’administration plus strict.
 
-5) Mettre à jour la config dans `admin.html`
-- Ouvrez `admin.html` et remplacez les valeurs "REPLACE_ME" par celles de votre projet Firebase.
+6. Migration initiale des données
 
-6) Migration initiale des données
-- Depuis l'interface d'administration, cliquez sur "Réinitialiser" puis ajoutez ou importez vos produits, ou utilisez le bouton Export/Import JSON.
+- Ouvrez la page d’administration.
+- Ajoutez, modifiez ou réinitialisez les produits.
+- Les données seront écrites dans Firestore si la configuration est valide.
 
-7) Tester
-- Ouvrez le site (index.html) et l'admin (admin.html) sur le même navigateur. Les modifications sauvegardées dans l'admin seront synchronisées vers Firestore et répercutées dans le site lors du rafraîchissement.
+7. Tester
 
-Besoin que je génère les règles Firestore plus sûres et l'intégration Firebase Auth ? Je peux l'automatiser pour vous.
+- Ouvrez le site et l’admin dans le même navigateur.
+- Le site lit d’abord le catalogue localStorage, puis synchronise depuis Firestore s’il est disponible.
+
+8. Remarque importante
+
+- Le code actuel est prêt pour Firebase, mais sans identifiants réels il continue à fonctionner en mode local, sans casser le site.

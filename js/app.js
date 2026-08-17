@@ -12,9 +12,13 @@ function getProducts() {
     return getDefaultProducts();
 }
 
+function isFirestoreReady() {
+    return !!(window.firestore && typeof window.firestore.collection === 'function');
+}
+
 // Si Firestore est disponible, récupérer les produits distante et mettre à jour l'UI
 async function syncProductsFromFirestoreIfAvailable(renderCallback) {
-    if (!window.firestore) return;
+    if (!isFirestoreReady()) return;
     try {
         const snapshot = await window.firestore.collection('products').get();
         const docs = snapshot.docs.map(d => ({ id: parseInt(d.id, 10) || Number(d.id), ...d.data() }));

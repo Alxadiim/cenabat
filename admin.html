@@ -87,6 +87,10 @@
         </div>
     </nav>
 
+    <div class="container mt-3">
+        <div id="firebase-status" class="alert alert-warning mb-3 d-none" role="alert"></div>
+    </div>
+
     <div class="container-fluid">
         <div class="row admin-container">
             <!-- Sidebar -->
@@ -304,32 +308,57 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script>
-        const firebaseConfig = window.CENABAT_FIREBASE_CONFIG || {
-            apiKey: "REPLACE_ME",
-            authDomain: "REPLACE_ME",
-            projectId: "REPLACE_ME",
-            storageBucket: "REPLACE_ME",
-            messagingSenderId: "REPLACE_ME",
-            appId: "REPLACE_ME"
+        window.CENABAT_FIREBASE_CONFIG = {
+            apiKey: "AIzaSyA1QsmcHEd0pbsdUQ3O6s_YlpluEE19ntA",
+            authDomain: "cenabat-36e51.firebaseapp.com",
+            projectId: "cenabat-36e51",
+            storageBucket: "cenabat-36e51.firebasestorage.app",
+            messagingSenderId: "688975853066",
+            appId: "1:688975853066:web:2cb6fbfedbc4b7d1d491f3",
+            measurementId: "G-6TX8VS8FPD"
         };
 
-        const hasRealFirebaseConfig = Object.values(firebaseConfig).some(value => {
-            return typeof value === 'string' && value && !value.includes('REPLACE_ME');
-        });
+        function initFirebase() {
+            const firebaseConfig = window.CENABAT_FIREBASE_CONFIG || {};
+            const hasRealFirebaseConfig = Object.values(firebaseConfig).some(value => {
+                return typeof value === 'string' && value && !value.includes('REPLACE_ME');
+            });
 
-        try {
-            if (hasRealFirebaseConfig && window.firebase) {
-                firebase.initializeApp(firebaseConfig);
-                window.firestore = firebase.firestore();
-                console.info('Firebase initialisé (compat).');
-            } else {
-                window.firestore = null;
-                console.info('Firebase non configuré : le site continue en mode localStorage.');
+            try {
+                if (hasRealFirebaseConfig && typeof firebase !== 'undefined') {
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(firebaseConfig);
+                    }
+                    window.firestore = firebase.firestore();
+                    window.CENABAT_FIREBASE_READY = true;
+                    console.info('Firebase initialisé (compat).');
+                    return;
+                }
+            } catch (e) {
+                console.warn('Impossible d\'initialiser Firebase:', e);
             }
-        } catch (e) {
+
             window.firestore = null;
-            console.warn('Impossible d\'initialiser Firebase:', e);
+            window.CENABAT_FIREBASE_READY = false;
+            console.info('Firebase non configuré : le site continue en mode localStorage.');
         }
+
+        function updateFirebaseStatus() {
+            const statusEl = document.getElementById('firebase-status');
+            if (!statusEl) return;
+
+            if (window.CENABAT_FIREBASE_READY && window.firestore) {
+                statusEl.className = 'alert alert-success mb-3';
+                statusEl.textContent = 'Firebase connecté : le catalogue peut être synchronisé en temps réel.';
+            } else {
+                statusEl.className = 'alert alert-warning mb-3';
+                statusEl.textContent = 'Firebase non connecté : le catalogue fonctionne en mode localStorage. Configurez Firestore pour synchroniser les données en ligne.';
+            }
+            statusEl.classList.remove('d-none');
+        }
+
+        initFirebase();
+        window.addEventListener('DOMContentLoaded', updateFirebaseStatus);
     </script>
     <script src="js/admin.js"></script>
 </body>
