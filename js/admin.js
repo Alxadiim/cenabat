@@ -1,5 +1,5 @@
 /**
- * CENABAT SARL - Système d'Administration
+ * CENABAT - Système d'Administration
  * Gestion complète du catalogue de produits
  */
 

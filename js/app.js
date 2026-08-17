@@ -1,5 +1,5 @@
 /**
- * CENABAT SARL - Application de Devis
+ * CENABAT - Application de Devis
  * Gestion du catalogue de produits et du panier de devis
  */
 
