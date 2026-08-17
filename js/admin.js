@@ -11,22 +11,30 @@ let currentEditingProduct = null;
 window.addEventListener('load', function() {
     const auth = sessionStorage.getItem('cenabat_admin_auth');
     const hasPassword = localStorage.getItem('cenabat_admin_password');
-    
-    if (auth !== 'true') {
-        requestPassword();
-    }
-    
+
     if (!hasPassword) {
         localStorage.setItem('cenabat_admin_password', 'admin123');
     }
-    
+
+    if (auth !== 'true') {
+        showLoginModal();
+    } else {
+        isAuthenticated = true;
+        document.getElementById('admin-user').textContent = 'Admin Connecté';
+    }
+
     loadProductsTable();
     setupFormListeners();
+    setupLoginEnterHandler();
 });
 
 // === Firestore helpers ===
+function isFirestoreReady() {
+    return !!(window.firestore && typeof window.firestore.collection === 'function');
+}
+
 async function fetchProductsFromFirestore() {
-    if (!window.firestore) return null;
+    if (!isFirestoreReady()) return null;
     try {
         const snapshot = await window.firestore.collection('products').get();
         const docs = snapshot.docs.map(d => ({ id: parseInt(d.id, 10) || Number(d.id), ...d.data() }));
@@ -38,7 +46,7 @@ async function fetchProductsFromFirestore() {
 }
 
 async function saveProductsToFirestore(products) {
-    if (!window.firestore) return;
+    if (!isFirestoreReady()) return;
     try {
         const batch = window.firestore.batch();
         const colRef = window.firestore.collection('products');
@@ -54,59 +62,110 @@ async function saveProductsToFirestore(products) {
 }
 
 // === Authentification ===
-function requestPassword() {
-    const password = prompt('Entrez le mot de passe d\'administration:');
+function showLoginModal() {
+    const modalEl = document.getElementById('loginModal');
+    if (!modalEl) return;
+
+    const modal = new bootstrap.Modal(modalEl, {
+        backdrop: 'static',
+        keyboard: false
+    });
+    modal.show();
+}
+
+function loginAdmin() {
+    const password = document.getElementById('admin-password')?.value || '';
     const correctPassword = localStorage.getItem('cenabat_admin_password') || 'admin123';
-    
+    const errorEl = document.getElementById('login-error');
+
     if (password === correctPassword) {
         sessionStorage.setItem('cenabat_admin_auth', 'true');
         isAuthenticated = true;
         document.getElementById('admin-user').textContent = 'Admin Connecté';
+
+        if (errorEl) errorEl.classList.add('d-none');
+        const modal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
+        if (modal) modal.hide();
+        document.getElementById('admin-password').value = '';
     } else {
-        alert('Mot de passe incorrect!');
-        window.location.href = 'index.html';
+        if (errorEl) errorEl.classList.remove('d-none');
     }
+}
+
+function requestPassword() {
+    showLoginModal();
 }
 
 function logout() {
     sessionStorage.removeItem('cenabat_admin_auth');
-    window.location.href = 'index.html';
+    const loginInput = document.getElementById('admin-password');
+    if (loginInput) loginInput.value = '';
+    document.getElementById('admin-user').textContent = 'Admin';
+    showLoginModal();
+}
+
+function setupLoginEnterHandler() {
+    const input = document.getElementById('admin-password');
+    if (!input) return;
+
+    input.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            loginAdmin();
+        }
+    });
 }
 
 // === Gestion des onglets ===
-function switchTab(tabName) {
+function switchTab(tabName, clickedLink = null) {
     // Masquer tous les onglets
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.add('d-none');
     });
-    
+
     // Désactiver tous les liens
     document.querySelectorAll('.admin-sidebar .nav-link').forEach(link => {
         link.classList.remove('active');
     });
-    
+
     // Afficher l'onglet sélectionné
     const tabElement = document.getElementById(tabName + '-tab');
     if (tabElement) {
         tabElement.classList.remove('d-none');
     }
-    
-    // Activer le lien
-    event.target.classList.add('active');
+
+    // Activer le lien si fourni
+    if (clickedLink) {
+        clickedLink.classList.add('active');
+    }
 }
 
 // === Chargement et affichage des produits ===
 function loadProductsTable() {
     const tbody = document.getElementById('products-table-body');
+    if (!tbody) return;
+
     // Rendu initial depuis localStorage pour rapidité
     const localProducts = getProducts();
-    
+
+    if (!localProducts.length) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center text-muted py-4">
+                    <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                    Aucun produit. Commencez par en ajouter un.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
     tbody.innerHTML = localProducts.map(product => `
         <tr>
             <td>#${product.id}</td>
             <td><strong>${product.name}</strong></td>
-            <td><span class="badge bg-info">${product.categoryLabel}</span></td>
-            <td>${product.description.substring(0, 30)}...</td>
+            <td><span class="badge bg-info">${product.categoryLabel || getCategoryLabel(product.category)}</span></td>
+            <td>${(product.description || '').substring(0, 30)}${(product.description || '').length > 30 ? '...' : ''}</td>
             <td>${product.price ? product.price + ' XOF' : '-'}</td>
             <td>
                 <button class="btn btn-sm btn-warning btn-action" onclick="editProduct(${product.id})">
@@ -118,24 +177,13 @@ function loadProductsTable() {
             </td>
         </tr>
     `).join('');
-    
-    if (products.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="6" class="text-center text-muted py-4">
-                    <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
-                    Aucun produit. Commencez par en ajouter un.
-                </td>
-            </tr>
-        `;
-    }
 
     // Si Firestore est configuré, remplacer par les données serveur (sync)
-    if (window.firestore) {
+    if (isFirestoreReady()) {
         fetchProductsFromFirestore().then(remote => {
             if (remote && remote.length) {
-                saveProducts(remote); // met à jour localStorage
-                loadProductsTable(); // re-render
+                saveProducts(remote);
+                loadProductsTable();
             }
         });
     }
@@ -252,7 +300,7 @@ function saveProduct(e) {
     
     saveProducts(products);
     // Tentative d'envoi vers Firestore en arrière-plan
-    if (window.firestore) {
+    if (isFirestoreReady()) {
         saveProductsToFirestore(products);
     }
     resetForm();
@@ -277,8 +325,7 @@ function deleteProduct(productId) {
     let products = getProducts();
     products = products.filter(p => p.id !== productId);
     saveProducts(products);
-    if (window.firestore) {
-        // Mettre à jour Firestore
+    if (isFirestoreReady()) {
         saveProductsToFirestore(products);
     }
     loadProductsTable();

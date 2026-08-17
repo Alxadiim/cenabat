@@ -256,28 +256,31 @@ function getDefaultProducts() {
 }
 
 let products = getProducts();
-        category: "menuiserie",
-        categoryLabel: "Menuiserie",
-        description: "Plinthe bois massif 2m",
-        icon: "fa-ruler-horizontal"
-    }
-];
 
 // === État du panier de devis ===
 let cart = [];
 
+function refreshProducts() {
+    products = getProducts();
+}
+
 // === Initialisation ===
 document.addEventListener('DOMContentLoaded', function() {
+    refreshProducts();
     renderProducts('all');
     setupCategoryFilters();
     setupDevisForm();
     setupCartButtons();
     // Synchroniser depuis Firestore si disponible
-    syncProductsFromFirestoreIfAvailable(() => renderProducts(document.querySelector('.category-filters .active')?.dataset.category || 'all'));
+    syncProductsFromFirestoreIfAvailable(() => {
+        refreshProducts();
+        renderProducts(document.querySelector('.category-filters .active')?.dataset.category || 'all');
+    });
 });
 
 // === Rendu des produits ===
 function renderProducts(category) {
+    refreshProducts();
     const grid = document.getElementById('products-grid');
     const filteredProducts = category === 'all' 
         ? products 

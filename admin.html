@@ -92,13 +92,13 @@
             <!-- Sidebar -->
             <div class="col-md-2 admin-sidebar">
                 <nav class="nav flex-column">
-                    <a class="nav-link active" href="#products" onclick="switchTab('products')">
+                    <a class="nav-link active" href="#products" onclick="switchTab('products', this); return false;">
                         <i class="fas fa-list me-2"></i>Produits
                     </a>
-                    <a class="nav-link" href="#add-product" onclick="switchTab('add-product')">
+                    <a class="nav-link" href="#add-product" onclick="switchTab('add-product', this); return false;">
                         <i class="fas fa-plus-circle me-2"></i>Ajouter Produit
                     </a>
-                    <a class="nav-link" href="#settings" onclick="switchTab('settings')">
+                    <a class="nav-link" href="#settings" onclick="switchTab('settings', this); return false;">
                         <i class="fas fa-cog me-2"></i>Paramètres
                     </a>
                     <a class="nav-link" href="index.html">
@@ -280,13 +280,31 @@
         </div>
     </div>
 
+    <!-- Modal de connexion admin -->
+    <div class="modal fade" id="loginModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title"><i class="fas fa-lock me-2"></i>Connexion admin</h5>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label fw-bold">Mot de passe</label>
+                    <input type="password" id="admin-password" class="form-control" placeholder="Saisissez le mot de passe">
+                    <div id="login-error" class="text-danger small mt-2 d-none">Mot de passe incorrect.</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning w-100" onclick="loginAdmin()">Se connecter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Firebase SDK (compat) - Remplacez la config ci-dessous par la vôtre -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script>
-        // TODO: remplacez ces valeurs par votre configuration Firebase
-        const firebaseConfig = {
+        const firebaseConfig = window.CENABAT_FIREBASE_CONFIG || {
             apiKey: "REPLACE_ME",
             authDomain: "REPLACE_ME",
             projectId: "REPLACE_ME",
@@ -295,13 +313,21 @@
             appId: "REPLACE_ME"
         };
 
+        const hasRealFirebaseConfig = Object.values(firebaseConfig).some(value => {
+            return typeof value === 'string' && value && !value.includes('REPLACE_ME');
+        });
+
         try {
-            if (firebaseConfig.apiKey && firebaseConfig.projectId) {
+            if (hasRealFirebaseConfig && window.firebase) {
                 firebase.initializeApp(firebaseConfig);
                 window.firestore = firebase.firestore();
                 console.info('Firebase initialisé (compat).');
+            } else {
+                window.firestore = null;
+                console.info('Firebase non configuré : le site continue en mode localStorage.');
             }
         } catch (e) {
+            window.firestore = null;
             console.warn('Impossible d\'initialiser Firebase:', e);
         }
     </script>
